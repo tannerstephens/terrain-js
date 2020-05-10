@@ -1,7 +1,9 @@
 import * as PIXI from 'pixi.js';
-import Generator from './generator';
+import * as SimplexNoise from 'simplex-noise';
 
-const scale = 6;
+const frequency = 1024;
+
+
 const terrainColors = [
   0xe5d9c2,
   0xb5ba61,
@@ -16,7 +18,7 @@ const waterColor = 0xb6d0e3;
 class App {
   constructor() {
     this.app = new PIXI.Application({
-      backgroundColor: 0xffffff,
+      backgroundColor: 0x000000,
     });
 
     this.app.renderer.view.style.position = "absolute";
@@ -35,54 +37,49 @@ class App {
   }
 
   setup() {
-    const gr = new PIXI.Graphics();
-    gr.beginFill(0xffffff);
-    gr.drawRect(0,0,scale,scale);
-    gr.endFill();
+    const mainNoise = new SimplexNoise(Math.random());
+    const extraNoise = new SimplexNoise(Math.random());
+    const canvas = document.createElement("canvas");
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+    const context = canvas.getContext('2d');
+    let imgData = context.createImageData(innerWidth, innerHeight);
 
-    this.texture = this.app.renderer.generateTexture(gr);
+    const setPixel = (x,y,color) => {
+      const index = (y*imgData.width + x)*4;
 
-    this.generator = new Generator();
+      const r = (color & 0xff0000) >> 16;
+      const g = (color & 0x00ff00) >> 8;
+      const b = (color & 0x0000ff);
 
-    this.x = 0;
-    this.y = 0;
+      imgData.data[index] = r;
+      imgData.data[index+1] = g;
+      imgData.data[index+2] = b;
+      imgData.data[index+3] = 255;
+    };
 
-    this.step = 0;
+    for(let y = 0; y < innerHeight; y++) {
+      for(let x = 0; x < innerWidth; x++) {
+        let mainValue = (mainNoise.noise2D(x/1024, y/1024)+1)/2;
+        let extraValue = (extraNoise.noise2D(x/256, y/256)) * 0.25;
+        let value = mainValue+extraValue;
+        let color = value < waterLevel ? waterColor : terrainColors[Math.min(Math.floor(value*terrainColors.length), terrainColors.length-1)];
 
+        setPixel(x,y,color);
+      }
+    }
+
+    context.putImageData(imgData, 0, 0);
+    
+    const texture = PIXI.Texture.from(canvas);
+    const background = PIXI.Sprite.from(texture);
+
+    this.app.stage.addChild(background);
   }
 
   gameLoop(delta) {
-    if(this.step == 0) {
-      this.genRow();
-    }
-    if(this.y*scale > innerHeight) {
-      this.y = 0;
-      this.step = 1;
-    }
+
   }
-
-  genRow() {
-    const pixels = [];
-    while(this.x*scale < innerWidth) {
-      let value = this.generator.getValue(this.x, this.y);
-      let color = value < waterLevel ? waterColor : terrainColors[Math.floor(value*terrainColors.length)];
-      let pixel = this.createPixel(this.x, this.y, color);
-      pixels.push(pixel);
-      this.x += 1;
-    }
-    this.app.stage.addChild(...pixels);
-    this.x = 0;
-    this.y += 1;
-  }
-
-  createPixel(x,y,color) {
-    const pixel = new PIXI.Sprite(this.texture);
-    pixel.position.x = x*scale;
-    pixel.position.y = y*scale;
-    pixel.tint = color;
-    return pixel
-  } 
-
 }
 
 export default App;
