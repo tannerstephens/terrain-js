@@ -2,6 +2,8 @@ const projectSettings = require('./projectSettings');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HTMLWebpackPlugin = require('html-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin');
+const path = require('path');
+
 
 module.exports = {
     mode: 'production',
@@ -34,8 +36,9 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.html&/i,
-                loader: 'html-loader',
+                test: /\.html$/i,
+                include: path.resolve(__dirname, 'src'),
+                use: 'html-loader',
             },
         ],
     },
