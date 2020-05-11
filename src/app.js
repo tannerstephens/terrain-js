@@ -36,6 +36,7 @@ class App {
     this.texture = new CanvasTexture(innerWidth, innerHeight);
     this.background = PIXI.Sprite.from(this.texture);
 
+    this.controls = null;
     this.noise1frequency = {};
     this.noise1Amplitude = {};
 
@@ -57,30 +58,32 @@ class App {
   }
 
   setupControls() {
-    this.controls = window.open('', '', 'scrollbars=0,toolbar=0,height=270,width=600');
+    if(this.controls === null || this.controls.closed) {
+      this.controls = window.open('', '', 'scrollbars=0,toolbar=0,height=270,width=600');
 
-    this.controls.document.write(controlsHTML);
+      this.controls.document.write(controlsHTML);
 
-    this.noise1frequency = this.controls.document.getElementById('noise1freq');
-    this.noise1Amplitude = this.controls.document.getElementById('noise1amp');
+      this.noise1frequency = this.controls.document.getElementById('noise1freq');
+      this.noise1Amplitude = this.controls.document.getElementById('noise1amp');
 
-    this.noise2frequency = this.controls.document.getElementById('noise2freq');
-    this.noise2Amplitude = this.controls.document.getElementById('noise2amp');
+      this.noise2frequency = this.controls.document.getElementById('noise2freq');
+      this.noise2Amplitude = this.controls.document.getElementById('noise2amp');
 
-    this.noise3frequency = this.controls.document.getElementById('noise3freq');
-    this.noise3Amplitude = this.controls.document.getElementById('noise3amp');
+      this.noise3frequency = this.controls.document.getElementById('noise3freq');
+      this.noise3Amplitude = this.controls.document.getElementById('noise3amp');
 
-    const button = this.controls.document.getElementById('render');
+      const button = this.controls.document.getElementById('render');
 
-    button.addEventListener('click', () => {
-      button.disabled = true;
-      this.render();
-      button.disabled = false;
-    });
+      button.addEventListener('click', () => {
+        button.disabled = true;
+        this.render();
+        button.disabled = false;
+      });
 
-    window.addEventListener('beforeunload', () => {
-      this.controls.close();
-    })
+      window.addEventListener('beforeunload', () => {
+        this.controls.close();
+      });
+    }
   }
 
   render() {
