@@ -33,9 +33,22 @@ class App {
   }
 
   setup() {
-    this.setupControls();
     this.texture = new CanvasTexture(innerWidth, innerHeight);
     this.background = PIXI.Sprite.from(this.texture);
+
+    this.noise1frequency = {};
+    this.noise1Amplitude = {};
+
+    this.noise2frequency = {};
+    this.noise2Amplitude = {};
+
+    this.noise3frequency = {};
+    this.noise3Amplitude = {};
+
+    this.background.interactive = true;
+    this.background.on('pointertap', () => {
+      this.setupControls();
+    });
 
     this.app.stage.addChild(this.background);
 
@@ -60,7 +73,6 @@ class App {
     const button = this.controls.document.getElementById('render');
 
     button.addEventListener('click', () => {
-      console.log('rendering');
       button.disabled = true;
       this.render();
       button.disabled = false;
@@ -72,14 +84,14 @@ class App {
   }
 
   render() {
-    const n1f = this.noise1frequency.value;
-    const n1a = this.noise1Amplitude.value;
+    const n1f = this.noise1frequency.value || 1024;
+    const n1a = this.noise1Amplitude.value || 1;
 
-    const n2f = this.noise2frequency.value;
-    const n2a = this.noise2Amplitude.value;
+    const n2f = this.noise2frequency.value || 256;
+    const n2a = this.noise2Amplitude.value || 0.25;
 
-    const n3f = this.noise3frequency.value;
-    const n3a = this.noise3Amplitude.value;
+    const n3f = this.noise3frequency.value || 64;
+    const n3a = this.noise3Amplitude.value || 0.0625;
 
     const setNoise = (x, y) => {
       const noise1Value = (this.noise1.noise2D(x/n1f, y/n1f))*n1a;
