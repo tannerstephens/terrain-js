@@ -76,7 +76,6 @@ class App {
       const seedButton = this.controls.document.getElementById('seed');
 
       renderButton.addEventListener('click', () => {
-        this.controls.document.getElementById('loading').style.display = 'block';
         this.render();
       });
 
