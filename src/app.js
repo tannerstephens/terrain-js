@@ -1,8 +1,7 @@
 import * as PIXI from 'pixi.js';
 import * as SimplexNoise from 'simplex-noise';
-
-const frequency = 1024;
-
+import CanvasTexture from './canvasTexture';
+import controlsHTML from './controls.html';
 
 const terrainColors = [
   0xe5d9c2,
@@ -12,7 +11,6 @@ const terrainColors = [
   0xced6b6,
   0xfffafa
 ];
-const waterLevel = 0.1;
 const waterColor = 0xb6d0e3;
 
 class App {
@@ -27,8 +25,6 @@ class App {
     this.app.renderer.resize(window.innerWidth, window.innerHeight);
 
     this.setup();
-
-    this.app.ticker.add((delta) => this.gameLoop(delta));
   }
 
   display() {
@@ -37,48 +33,78 @@ class App {
   }
 
   setup() {
-    const mainNoise = new SimplexNoise(Math.random());
-    const extraNoise = new SimplexNoise(Math.random());
-    const canvas = document.createElement("canvas");
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-    const context = canvas.getContext('2d');
-    let imgData = context.createImageData(innerWidth, innerHeight);
+    this.setupControls();
+    this.texture = new CanvasTexture(innerWidth, innerHeight);
+    this.background = PIXI.Sprite.from(this.texture);
 
-    const setPixel = (x,y,color) => {
-      const index = (y*imgData.width + x)*4;
+    this.app.stage.addChild(this.background);
 
-      const r = (color & 0xff0000) >> 16;
-      const g = (color & 0x00ff00) >> 8;
-      const b = (color & 0x0000ff);
+    this.seed();
+    this.render();
+  }
 
-      imgData.data[index] = r;
-      imgData.data[index+1] = g;
-      imgData.data[index+2] = b;
-      imgData.data[index+3] = 255;
-    };
+  setupControls() {
+    this.controls = window.open('', '', 'scrollbars=0,toolbar=0,height=270,width=600');
+
+    this.controls.document.write(controlsHTML);
+
+    this.noise1frequency = this.controls.document.getElementById('noise1freq');
+    this.noise1Amplitude = this.controls.document.getElementById('noise1amp');
+
+    this.noise2frequency = this.controls.document.getElementById('noise2freq');
+    this.noise2Amplitude = this.controls.document.getElementById('noise2amp');
+
+    this.noise3frequency = this.controls.document.getElementById('noise3freq');
+    this.noise3Amplitude = this.controls.document.getElementById('noise3amp');
+
+    const button = this.controls.document.getElementById('render');
+
+    button.addEventListener('click', () => {
+      console.log('rendering');
+      button.disabled = true;
+      this.render();
+      button.disabled = false;
+    });
+
+    window.addEventListener('beforeunload', () => {
+      this.controls.close();
+    })
+  }
+
+  render() {
+    const n1f = this.noise1frequency.value;
+    const n1a = this.noise1Amplitude.value;
+
+    const n2f = this.noise2frequency.value;
+    const n2a = this.noise2Amplitude.value;
+
+    const n3f = this.noise3frequency.value;
+    const n3a = this.noise3Amplitude.value;
+
+    const setNoise = (x, y) => {
+      const noise1Value = (this.noise1.noise2D(x/n1f, y/n1f))*n1a;
+      const noise2Value = (this.noise1.noise2D(x/n2f, y/n2f))*n2a;
+      const noise3Value = (this.noise1.noise2D(x/n3f, y/n3f))*n3a;
+
+      const value = noise1Value + noise2Value + noise3Value;
+
+      const color = value < 0.1 ? waterColor : terrainColors[Math.min(Math.floor(value*terrainColors.length), terrainColors.length-1)];
+
+      this.texture.setPixel(x, y, color);
+    }
 
     for(let y = 0; y < innerHeight; y++) {
       for(let x = 0; x < innerWidth; x++) {
-        let mainValue = (mainNoise.noise2D(x/1024, y/1024)+1)/2;
-        let extraValue = (extraNoise.noise2D(x/256, y/256)) * 0.25;
-        let value = mainValue+extraValue;
-        let color = value < waterLevel ? waterColor : terrainColors[Math.min(Math.floor(value*terrainColors.length), terrainColors.length-1)];
-
-        setPixel(x,y,color);
+        setNoise(x, y);
       }
     }
-
-    context.putImageData(imgData, 0, 0);
-    
-    const texture = PIXI.Texture.from(canvas);
-    const background = PIXI.Sprite.from(texture);
-
-    this.app.stage.addChild(background);
+    this.texture.update();
   }
 
-  gameLoop(delta) {
-
+  seed() {
+    this.noise1 = new SimplexNoise(Math.random());
+    this.noise2 = new SimplexNoise(Math.random());
+    this.noise3 = new SimplexNoise(Math.random());
   }
 }
 

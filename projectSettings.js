@@ -1,3 +1,3 @@
 module.exports = {
-  title: 'pixiTemplate',
+  title: 'Terrain-JS',
 };

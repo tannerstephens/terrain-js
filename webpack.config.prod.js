@@ -30,5 +30,13 @@ module.exports = {
             minify: false,
             title: projectSettings.title,
         })
-    ]
+    ],
+    module: {
+        rules: [
+            {
+                test: /\.html&/i,
+                loader: 'html-loader',
+            },
+        ],
+    },
 }
