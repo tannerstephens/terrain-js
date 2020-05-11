@@ -72,12 +72,17 @@ class App {
       this.noise3frequency = this.controls.document.getElementById('noise3freq');
       this.noise3Amplitude = this.controls.document.getElementById('noise3amp');
 
-      const button = this.controls.document.getElementById('render');
+      const renderButton = this.controls.document.getElementById('render');
+      const seedButton = this.controls.document.getElementById('seed');
 
-      button.addEventListener('click', () => {
-        button.disabled = true;
+      renderButton.addEventListener('click', () => {
+        this.controls.document.getElementById('loading').style.display = 'block';
         this.render();
-        button.disabled = false;
+      });
+
+      seedButton.addEventListener('click', () => {
+        this.seed();
+        this.render();
       });
 
       window.addEventListener('beforeunload', () => {
