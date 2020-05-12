@@ -21,6 +21,7 @@ class App {
 
     this.app.renderer.view.style.position = "absolute";
     this.app.renderer.view.style.display = "block";
+    this.app.renderer.view.style.zIndex = -1;
     this.app.renderer.autoResize = true;
     this.app.renderer.resize(window.innerWidth, window.innerHeight);
 
@@ -122,8 +123,6 @@ class App {
 
   seed() {
     this.noise1 = new SimplexNoise(Math.random());
-    this.noise2 = new SimplexNoise(Math.random());
-    this.noise3 = new SimplexNoise(Math.random());
   }
 }
 
