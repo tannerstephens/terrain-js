@@ -46,6 +46,7 @@ See the dist/ folder for static output files.
 
 * [webpack](https://webpack.js.org/) - Bundling
 * [jsPanel](https://jspanel.de/) - Beautiful control panels
+* [threads.js](https://threads.js.org/) - Background rendering web worker
 * [simplex-noise](https://www.npmjs.com/package/simplex-noise) - Noise generation
 
 ## Authors
