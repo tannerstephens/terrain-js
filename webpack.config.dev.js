@@ -28,6 +28,10 @@ module.exports = {
                 include: path.resolve(__dirname, 'src'),
                 use: 'html-loader',
             },
+            {
+                test: /\.css$/i,
+                use: ['style-loader', 'css-loader'],
+            }
         ],
     },
 };
