@@ -1,6 +1,7 @@
 const projectSettings = require('./projectSettings');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
+const ThreadsPlugin = require('threads-plugin')
 const path = require('path');
 
 module.exports = {
@@ -19,7 +20,8 @@ module.exports = {
             template: 'build/index.html',
             filename: 'index.html',
             title: projectSettings.title
-        })
+        }),
+        new ThreadsPlugin()
     ],
     module: {
         rules: [

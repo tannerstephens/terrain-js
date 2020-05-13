@@ -2,6 +2,7 @@ const projectSettings = require('./projectSettings');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HTMLWebpackPlugin = require('html-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin');
+const ThreadsPlugin = require('threads-plugin')
 const path = require('path');
 
 
@@ -31,7 +32,8 @@ module.exports = {
             hash: true,
             minify: false,
             title: projectSettings.title,
-        })
+        }),
+        new ThreadsPlugin()
     ],
     module: {
         rules: [

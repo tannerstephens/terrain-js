@@ -48,10 +48,6 @@ See the dist/ folder for static output files.
 * [jsPanel](https://jspanel.de/) - Beautiful control panels
 * [simplex-noise](https://www.npmjs.com/package/simplex-noise) - Noise generation
 
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags).
-
 ## Authors
 
 * **Tanner Stephens**
