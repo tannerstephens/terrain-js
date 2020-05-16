@@ -2,31 +2,37 @@ import { jsPanel } from 'jspanel4';
 import defaultConfig from './defaultConfig';
 import './controlPanel.css'
 
-const createElement = (elementConfig) => {
-  const element = document.createElement(elementConfig.tag);
+const createElement = ({
+  tag,
+  text,
+  class: cls,
+  attrs,
+  listeners,
+  children
+}) => {
+  const element = document.createElement(tag);
   element.id = Math.random()*1000000;
 
-  if(elementConfig.text) {
-    element.innerText = elementConfig.text;
-  }
+  children = [].concat(children || []);
 
-  if(elementConfig.attrs) {
-    Object.keys(elementConfig.attrs).forEach((key) => {
-      element.setAttribute(key, elementConfig.attrs[key]);
-    })
-  }
+  if(text)
+    element.innerText = text;
 
-  if(elementConfig.listeners) {
-    Object.keys(elementConfig.listeners).forEach((key) => {
-      element.addEventListener(key, elementConfig.listeners[key](element));
+  if(cls)
+    element.setAttribute('class', cls);
+
+  if(attrs)
+    Object.keys(attrs).forEach((key) => {
+      element.setAttribute(key, attrs[key]);
     });
-  }
 
-  if(elementConfig.children) {
-    const children = elementConfig.children.map((childConfig) => createElement(childConfig));
+  if(listeners)
+    Object.keys(listeners).forEach((key) => {
+      element.addEventListener(key, listeners[key](element));
+    });
 
-    children.forEach((child) => element.appendChild(child));
-  }
+  if(children.length)
+    children.forEach((childConfig) => element.appendChild(createElement(childConfig)));
 
   return element;
 }
